@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Calculator</title>
+    <style>
+        body { font-family: Arial; display: flex; justify-content: center; background: #f0f0f0; }
+        .calc-container { width: 300px; margin-top: 50px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        #display { width: 100%; height: 50px; font-size: 24px; text-align: right; margin-bottom: 10px; border: 1px solid #ccc; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        button { padding: 20px; font-size: 18px; border: none; cursor: pointer; border-radius: 5px; }
+        .operator { background: #ff9500; color: white; }
+        .clear { background: #d9d9d9; }
+        button:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div class="calc-container">
+    <input type="text" id="display" readonly value="0">
+    <div class="grid">
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button onclick="press('/')">/</button>
+        <button onclick="press('*')">*</button>
+        <button class="operator" onclick="calculate()">=</button>
+        
+        <button onclick="press('7')">7</button><button onclick="press('8')">8</button>
+        <button onclick="press('9')">9</button><button class="operator" onclick="press('-')">-</button>
+        
+        <button onclick="press('4')">4</button><button onclick="press('5')">5</button>
+        <button onclick="press('6')">6</button><button class="operator" onclick="press('+')">+</button>
+        
+        <button onclick="press('1')">1</button><button onclick="press('2')">2</button>
+        <button onclick="press('3')">3</button><button onclick="press('0')">0</button>
+    </div>
+</div>
+
+<script>
+    let currentExpression = "";
+    const display = document.getElementById('display');
+
+    function press(char) {
+        currentExpression += char;
+        display.value = currentExpression;
+    }
+
+    function clearDisplay() {
+        currentExpression = "";
+        display.value = "0";
+    }
+
+    async function calculate() {
+        // Send the expression to our Flask backend
+        const response = await fetch('/calculate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({expression: currentExpression})
+        });
+        const data = await response.json();
+        display.value = data.result;
+        currentExpression = data.result; // Allow continuous calculation
+    }
+</script>
+
+</body>
+</html>
+
