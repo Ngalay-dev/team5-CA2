@@ -19,7 +19,7 @@ def test_calculate_success():
         data=json.dumps({"expression": "2+3"}),
         content_type='application/json'
     )
-    assert response.json["result"] == "FAIL"
+    assert response.json["result"] == "5"
 
 def test_calculate_error():
     client = app.test_client()
