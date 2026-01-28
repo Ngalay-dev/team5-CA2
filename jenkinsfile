@@ -5,15 +5,16 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Ngalay-dev/team5-CA2.git',
-                    branch: 'main'
+                checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 sh '''
-                pip install -r requirements.txt
+                python3 --version
+                python3 -m pip install --upgrade pip
+                python3 -m pip install -r requirements.txt
                 '''
             }
         }
@@ -21,7 +22,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                pytest
+                python3 -m pytest
                 '''
             }
         }
@@ -29,10 +30,11 @@ pipeline {
 
     post {
         success {
-            echo 'Tests passed. Safe to proceed.'
+            echo ' Tests passed. Safe to proceed.'
         }
         failure {
-            echo 'Tests failed. Pipeline stopped.'
+            echo ' Tests failed. Pipeline stopped.'
         }
     }
 }
+
