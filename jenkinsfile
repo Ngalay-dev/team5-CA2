@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.9'
+            args '-u root'
+        }
+    }
 
     stages {
 
@@ -12,9 +17,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                python3 --version
-                python3 -m pip install --upgrade pip
-                python3 -m pip install -r requirements.txt
+                python --version
+                pip install --upgrade pip
+                pip install -r requirements.txt
                 '''
             }
         }
@@ -22,7 +27,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                python3 -m pytest
+                pytest
                 '''
             }
         }
@@ -30,10 +35,10 @@ pipeline {
 
     post {
         success {
-            echo ' Tests passed. Safe to proceed.'
+            echo ' Tests passed. CI pipeline successful.'
         }
         failure {
-            echo ' Tests failed. Pipeline stopped.'
+            echo ' Tests failed. CI pipeline stopped.'
         }
     }
 }
