@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/Ngalay-dev/team5-CA2.git',
+                    branch: 'main'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh '''
+                pytest
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Tests passed. Safe to proceed.'
+        }
+        failure {
+            echo 'Tests failed. Pipeline stopped.'
+        }
+    }
+}
