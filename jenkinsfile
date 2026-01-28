@@ -14,18 +14,18 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                python3 -m pip install --upgrade pip
-                python3 -m pip install -r requirements.txt
-                '''
+        stage('Install Dependencies & Run Tests (Quality Gate)') {
+            agent {
+                docker {
+                    image 'python:3.9'
+                    args '-u root'
+                }
             }
-        }
-
-        stage('Run Tests (Quality Gate)') {
             steps {
                 sh '''
+                python --version
+                pip install --upgrade pip
+                pip install -r requirements.txt
                 pytest
                 '''
             }
@@ -62,5 +62,4 @@ pipeline {
         }
     }
 }
-
 
