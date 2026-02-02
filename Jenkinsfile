@@ -9,23 +9,26 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Ngalay-dev/team5-CA2.git'
+                checkout scm
             }
         }
 
-        stage('Install Dependencies & Run Tests (Quality Gate)') {
-            agent {
-                docker {
-                    image 'python:3.9'
-                    args '-u root'
-                }
-            }
+        stage('Setup Python Virtual Environment') {
             steps {
                 sh '''
-                python --version
+                python3 --version
+                python3 -m venv venv
+                . venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Tests (Quality Gate)') {
+            steps {
+                sh '''
+                . venv/bin/activate
                 pytest
                 '''
             }
@@ -39,7 +42,11 @@ pipeline {
             }
         }
 
+        // OPTIONAL — only keep this if Swarm is running locally
         stage('Deploy to Docker Swarm') {
+            when {
+                expression { sh(script: 'docker info | grep -q Swarm', returnStatus: true) == 0 }
+            }
             steps {
                 sh '''
                 docker service rm calculator-service || true
@@ -55,11 +62,12 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline succeeded. App deployed to Docker Swarm.'
+            echo ' Pipeline succeeded. Tests passed and app built.'
         }
         failure {
-            echo 'Pipeline failed. Deployment blocked by quality gate.'
+            echo ' Pipeline failed. Deployment blocked by quality gate.'
         }
     }
 }
+
 
