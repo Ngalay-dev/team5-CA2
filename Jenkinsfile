@@ -1,53 +1,29 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "calculator-app"
-    }
-
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Ngalay-dev/team5-CA2.git'
+                checkout scm
             }
         }
 
-        stage('Install Dependencies & Run Tests (Quality Gate)') {
-            agent {
-                docker {
-                    image 'python:3.9'
-                    args '-u root'
-                }
-            }
+        stage('Setup Python Virtual Environment') {
             steps {
                 sh '''
-                python --version
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                pytest
+                python3 --version
+                python3 -m venv venv
+                venv/bin/pip install --upgrade pip
+                venv/bin/pip install -r requirements.txt
                 '''
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Run Tests (Quality Gate)') {
             steps {
                 sh '''
-                docker build -t $IMAGE_NAME .
-                '''
-            }
-        }
-
-        stage('Deploy to Docker Swarm') {
-            steps {
-                sh '''
-                docker service rm calculator-service || true
-                docker service create \
-                  --name calculator-service \
-                  --replicas 2 \
-                  -p 5000:5000 \
-                  $IMAGE_NAME
+                venv/bin/pytest
                 '''
             }
         }
@@ -55,11 +31,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline succeeded. App deployed to Docker Swarm.'
+            echo 'Pipeline succeeded'
         }
         failure {
-            echo 'Pipeline failed. Deployment blocked by quality gate.'
+            echo 'Pipeline failed'
         }
     }
 }
-
