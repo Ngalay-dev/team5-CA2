@@ -2,24 +2,28 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Ngalay-dev/team5-CA2.git', branch: 'main'
+                checkout scm
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup Python Virtual Environment') {
             steps {
                 sh '''
-                pip3 install -r requirements.txt
+                python3 --version
+                python3 -m venv venv
+                venv/bin/pip install --upgrade pip
+                venv/bin/pip install -r requirements.txt
                 '''
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Tests (Quality Gate)') {
             steps {
                 sh '''
-                pytest
+                venv/bin/pytest
                 '''
             }
         }
@@ -27,11 +31,10 @@ pipeline {
 
     post {
         success {
-            echo ' Tests passed. Pipeline successful.'
+            echo 'Pipeline succeeded'
         }
         failure {
-            echo ' Tests failed. Pipeline stopped.'
+            echo 'Pipeline failed'
         }
     }
 }
-
