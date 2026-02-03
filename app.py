@@ -19,9 +19,11 @@ def calculate():
         return jsonify({"result": result})
     except (SyntaxError, ZeroDivisionError, NameError):
         return jsonify({"result": "Error"})
- @app.route('/health', methods=['GET'])
- def health_check():
-     return jsonify({
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({
         "status": "UP"
     })
 
