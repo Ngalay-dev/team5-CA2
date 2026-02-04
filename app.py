@@ -5,6 +5,11 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return render_template('index.html')
+@app.route('/github-webhook/', methods=['POST'])
+def github_webhook():
+    print("GitHub webhook received")
+    return '', 200
+
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
@@ -19,6 +24,14 @@ def calculate():
         return jsonify({"result": result})
     except (SyntaxError, ZeroDivisionError, NameError):
         return jsonify({"result": "Error"})
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({
+        "status": "UP"
+    })
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
