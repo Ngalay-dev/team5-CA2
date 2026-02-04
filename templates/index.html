@@ -33,6 +33,11 @@
         <button onclick="press('3')">3</button><button onclick="press('0')">0</button>
     </div>
 </div>
+<div class="calc-container" style="margin-top:20px;">
+    <h3>History</h3>
+    <ul id="history" style="padding-left:20px;"></ul>
+</div>
+
 
 <script>
     let currentExpression = "";
@@ -57,6 +62,7 @@
         });
         const data = await response.json();
         display.value = data.result;
+        addToHistory(expression, data.result);
         currentExpression = data.result; // Allow continuous calculation
     }
 </script>
