@@ -64,7 +64,7 @@
 
 <!-- ✅ Build Version (CONFIRM DEPLOYMENT) -->
 <p style="color: green; font-weight: bold;">
-    
+    Version 2 of Calculator
 </p>
 
 <!-- Calculator -->
@@ -93,7 +93,10 @@
         <button onclick="press('0')">0</button>
     </div>
 </div>
-
+<div class="calc-container" style="margin-top:20px;">
+    <h3>History</h3>
+    <ul id="history" style="padding-left:20px;"></ul>
+</div>
 
 
 <!-- Scripts (AFTER DOM) -->
@@ -121,6 +124,20 @@
         const data = await response.json();
         display.value = data.result;
         currentExpression = data.result; // Allow continuous calculation
+    }
+</script>
+<script>
+    const historyList = document.getElementById('history');
+
+    function addToHistory(expression, result) {
+        const item = document.createElement('li');
+        item.textContent = expression + " = " + result;
+        historyList.prepend(item);
+
+        // keep only last 5 entries
+        if (historyList.children.length > 5) {
+            historyList.removeChild(historyList.lastChild);
+        }
     }
 </script>
 
