@@ -104,7 +104,6 @@
 <script>
     let currentExpression = "";
     const display = document.getElementById('display');
-    const historyList = document.getElementById('history');
 
     function press(char) {
         currentExpression += char;
@@ -117,28 +116,15 @@
     }
 
     async function calculate() {
-        const expression = currentExpression;
-
+        // Send the expression to our Flask backend
         const response = await fetch('/calculate', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ expression: expression })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({expression: currentExpression})
         });
-
         const data = await response.json();
         display.value = data.result;
-        addToHistory(expression, data.result);
-        currentExpression = data.result;
-    }
-
-    function addToHistory(expression, result) {
-        const item = document.createElement('li');
-        item.textContent = expression + " = " + result;
-        historyList.prepend(item);
-
-        if (historyList.children.length > 5) {
-            historyList.removeChild(historyList.lastChild);
-        }
+        currentExpression = data.result; // Allow continuous calculation
     }
 </script>
 
